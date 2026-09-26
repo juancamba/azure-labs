@@ -1,0 +1,9 @@
+{
+  "profiles": {
+    "EventProcessor_Function": {
+      "commandName": "Project",
+      "commandLineArgs": "--port 7115",
+      "launchBrowser": false
+    }
+  }
+}

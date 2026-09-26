@@ -1,0 +1,24 @@
+azure-event-local/
+│
+├── docker-compose.yml
+│
+├── .env
+│
+├── servicebus/
+│   └── Config.json
+│
+├── src/
+│   └── EventProcessor.Function/
+│       ├── Functions/
+│       │   └── ProcessOrderFunction.cs
+│       │   └── GenerateOrderFunction.cs
+│       ├── EventProcessor.Function.csproj
+│       ├── Program.cs
+│       ├── host.json
+│       ├── local.settings.json
+│       └── Dockerfile
+│
+└── producer/
+    └── EventProducer/
+        ├── EventProducer.csproj
+        └── Program.cs

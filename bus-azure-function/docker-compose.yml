@@ -1,0 +1,74 @@
+services:
+
+  servicebus-emulator:
+    image: mcr.microsoft.com/azure-messaging/servicebus-emulator:latest
+    container_name: servicebus-emulator
+
+    ports:
+      - "5672:5672"
+      - "5300:5300"
+
+    volumes:
+      - ./servicebus/Config.json:/ServiceBus_Emulator/ConfigFiles/Config.json
+
+    environment:
+      SQL_SERVER: mssql
+      MSSQL_SA_PASSWORD: ${MSSQL_SA_PASSWORD}
+      ACCEPT_EULA: Y
+      EMULATOR_HTTP_PORT: 5300
+
+    depends_on:
+      - mssql
+
+    networks:
+      - azure-local
+
+
+  mssql:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: servicebus-mssql
+
+    environment:
+      ACCEPT_EULA: Y
+      MSSQL_SA_PASSWORD: ${MSSQL_SA_PASSWORD}
+
+    networks:
+      - azure-local
+
+
+  azurite:
+    image: mcr.microsoft.com/azure-storage/azurite
+    container_name: azurite
+
+    ports:
+      - "10000:10000"
+      - "10001:10001"
+      - "10002:10002"
+
+    networks:
+      - azure-local
+
+
+  function:
+    build:
+      context: ./src/EventProcessor.Function
+      dockerfile: Dockerfile
+
+    container_name: event-processor
+
+    environment:
+      AzureWebJobsStorage1: UseDevelopmentStorage=true
+      AzureWebJobsStorage: "DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFeqC9gQ8...;BlobEndpoint=http://azurite:10000/devstoreaccount1;QueueEndpoint=http://azurite:10001/devstoreaccount1;TableEndpoint=http://azurite:10002/devstoreaccount1;"
+      FUNCTIONS_WORKER_RUNTIME: dotnet-isolated
+      ServiceBusConnection: "Endpoint=sb://servicebus-emulator;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=SAS_KEY_VALUE;UseDevelopmentEmulator=true"
+
+    depends_on:
+      - servicebus-emulator
+      - azurite
+
+    networks:
+      - azure-local
+
+
+networks:
+  azure-local:

@@ -1,0 +1,32 @@
+services:
+
+  servicebus-:
+    image: mcr.microsoft.com/azure-messaging/servicebus-emulator:latest
+    container_name: servicebus-emulator-sender
+
+    ports:
+      - "5672:5672"
+      - "5300:5300"
+
+    volumes:
+      - ./servicebus/Config.json:/ServiceBus_Emulator/ConfigFiles/Config.json
+
+    environment:
+      SQL_SERVER: mssql
+      MSSQL_SA_PASSWORD: "Your_strong_password123!"
+      ACCEPT_EULA: "Y"
+
+    depends_on:
+      - mssql
+
+  mssql:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: servicebus-emulator-mssql-sender
+
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: "Your_strong_password123!"
+      MSSQL_PID: "Developer"
+
+    ports:
+      - "1433:1433"
